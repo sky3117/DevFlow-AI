@@ -3,6 +3,7 @@ import { Router, Request, Response } from 'express';
 import { prisma } from '@devflow/db';
 import { groqReviewPR } from '../services/groq';
 import { fetchPRDiff, postGitHubComment } from '../services/github';
+import { webhookLimiter } from '../middleware/rateLimiter';
 
 export const webhookRouter = Router();
 
@@ -18,7 +19,7 @@ function verifySignature(payload: Buffer, signature: string): boolean {
   }
 }
 
-webhookRouter.post('/github', async (req: Request, res: Response) => {
+webhookRouter.post('/github', webhookLimiter, async (req: Request, res: Response) => {
   const signature = req.headers['x-hub-signature-256'] as string;
   const event = req.headers['x-github-event'] as string;
 

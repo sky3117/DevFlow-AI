@@ -1,5 +1,13 @@
 const GITHUB_API = 'https://api.github.com';
 
+/** Validates that owner and repo are safe alphanumeric GitHub identifiers to prevent SSRF */
+function validateGitHubIdentifier(value: string, name: string): void {
+  // GitHub usernames/org names and repo names: alphanumeric, hyphens, underscores, dots
+  if (!/^[a-zA-Z0-9._-]{1,100}$/.test(value)) {
+    throw new Error(`Invalid GitHub ${name}: "${value}"`);
+  }
+}
+
 async function getInstallationToken(installationId: number): Promise<string> {
   // For simplicity we use the GITHUB_WEBHOOK_SECRET as a PAT when no app token exists.
   // In production you'd generate a JWT from the GitHub App private key.
@@ -22,6 +30,9 @@ export async function fetchPRDiff(
   prNumber: number,
   installationId?: number
 ): Promise<string> {
+  validateGitHubIdentifier(owner, 'owner');
+  validateGitHubIdentifier(repo, 'repo');
+
   const token = installationId
     ? await getInstallationToken(installationId)
     : (process.env.GITHUB_TOKEN || '');
@@ -46,6 +57,9 @@ export async function postGitHubComment(
   body: string,
   installationId?: number
 ): Promise<void> {
+  validateGitHubIdentifier(owner, 'owner');
+  validateGitHubIdentifier(repo, 'repo');
+
   const token = installationId
     ? await getInstallationToken(installationId)
     : (process.env.GITHUB_TOKEN || '');

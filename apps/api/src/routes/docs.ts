@@ -2,10 +2,11 @@ import { Router, Response } from 'express';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 import { groqGenerateDocs } from '../services/groq';
 import { prisma } from '@devflow/db';
+import { docsLimiter } from '../middleware/rateLimiter';
 
 export const docsRouter = Router();
 
-docsRouter.post('/generate', requireAuth, async (req: AuthRequest, res: Response) => {
+docsRouter.post('/generate', docsLimiter, requireAuth, async (req: AuthRequest, res: Response) => {
   const { code, language, style } = req.body as {
     code?: string;
     language?: string;

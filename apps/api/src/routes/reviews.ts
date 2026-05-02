@@ -1,11 +1,12 @@
 import { Router, Response } from 'express';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 import { prisma } from '@devflow/db';
+import { apiLimiter } from '../middleware/rateLimiter';
 
 export const reviewsRouter = Router();
 
 // List reviews for current org
-reviewsRouter.get('/', requireAuth, async (req: AuthRequest, res: Response) => {
+reviewsRouter.get('/', apiLimiter, requireAuth, async (req: AuthRequest, res: Response) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: req.userId } });
     if (!user?.orgId) {
@@ -26,7 +27,7 @@ reviewsRouter.get('/', requireAuth, async (req: AuthRequest, res: Response) => {
 });
 
 // Get single review
-reviewsRouter.get('/:id', requireAuth, async (req: AuthRequest, res: Response) => {
+reviewsRouter.get('/:id', apiLimiter, requireAuth, async (req: AuthRequest, res: Response) => {
   try {
     const review = await prisma.review.findUnique({ where: { id: req.params.id } });
     if (!review) {

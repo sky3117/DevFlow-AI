@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import Stripe from 'stripe';
 import { prisma } from '@devflow/db';
 import { requireAuth, AuthRequest } from '../middleware/auth';
+import { apiLimiter } from '../middleware/rateLimiter';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2023-10-16' });
 
@@ -14,7 +15,7 @@ const PRICE_IDS: Record<string, string> = {
 };
 
 // Create Stripe checkout session
-billingRouter.post('/create-checkout-session', requireAuth, async (req: AuthRequest, res: Response) => {
+billingRouter.post('/create-checkout-session', apiLimiter, requireAuth, async (req: AuthRequest, res: Response) => {
   const { plan } = req.body as { plan?: string };
 
   if (!plan || !PRICE_IDS[plan]) {

@@ -3,15 +3,17 @@ import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import { prisma } from '@devflow/db';
 import { requireAuth, AuthRequest } from '../middleware/auth';
+import { authLimiter } from '../middleware/rateLimiter';
 
 export const authRouter = Router();
 
 // Initiate GitHub OAuth
-authRouter.get('/github', passport.authenticate('github', { session: false }));
+authRouter.get('/github', authLimiter, passport.authenticate('github', { session: false }));
 
 // GitHub OAuth callback
 authRouter.get(
   '/github/callback',
+  authLimiter,
   passport.authenticate('github', { session: false, failureRedirect: '/login' }),
   (req: Request, res: Response) => {
     const user = req.user as { id: string; email: string | null; role: string };
@@ -25,7 +27,7 @@ authRouter.get(
 );
 
 // Get current user
-authRouter.get('/me', requireAuth, async (req: AuthRequest, res: Response) => {
+authRouter.get('/me', authLimiter, requireAuth, async (req: AuthRequest, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.userId },
