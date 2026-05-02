@@ -18,6 +18,7 @@ export default function DocsPage() {
   const [result, setResult] = useState<DocsResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const handleGenerate = async () => {
     if (!code.trim()) return;
@@ -39,6 +40,13 @@ export default function DocsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCopy = async () => {
+    if (!result?.docs) return;
+    await navigator.clipboard.writeText(result.docs);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -115,11 +123,35 @@ export default function DocsPage() {
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="block text-sm text-gray-400">Generated Documentation</label>
-              {result && (
-                <span className="text-xs font-medium text-green-400">
-                  Coverage: {result.coverage}%
-                </span>
-              )}
+              <div className="flex items-center gap-3">
+                {result && (
+                  <span className="text-xs font-medium text-green-400">
+                    Coverage: {result.coverage}%
+                  </span>
+                )}
+                {result && (
+                  <button
+                    onClick={handleCopy}
+                    className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 px-2.5 py-1 rounded-lg transition-colors"
+                  >
+                    {copied ? (
+                      <>
+                        <svg className="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-green-400">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Copy
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 min-h-[420px] max-h-[600px] overflow-auto">
               {!result && !loading && (

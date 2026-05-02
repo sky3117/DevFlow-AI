@@ -5,6 +5,8 @@ import AuthCallback from './pages/AuthCallback';
 import DashboardPage from './pages/DashboardPage';
 import ReviewDetailPage from './pages/ReviewDetailPage';
 import DocsPage from './pages/DocsPage';
+import BillingPage from './pages/BillingPage';
+import SettingsPage from './pages/SettingsPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuth();
@@ -40,6 +42,22 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <DocsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/billing"
+            element={
+              <ProtectedRoute>
+                <BillingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
               </ProtectedRoute>
             }
           />
