@@ -8,13 +8,19 @@ function validateGitHubIdentifier(value: string, name: string): void {
   }
 }
 
-async function getInstallationToken(installationId: number): Promise<string> {
-  // For simplicity we use the GITHUB_WEBHOOK_SECRET as a PAT when no app token exists.
+async function getInstallationToken(_installationId: number): Promise<string> {
+  // For simplicity we use the GITHUB_TOKEN env var when no app token exists.
   // In production you'd generate a JWT from the GitHub App private key.
   return process.env.GITHUB_TOKEN || '';
 }
 
-async function githubFetch(url: string, token: string, options: RequestInit = {}): Promise<Response> {
+/**
+ * Make a request to the GitHub REST API.
+ * The `path` must start with '/' and is appended to the fixed GITHUB_API base URL
+ * so the full URL is always rooted at api.github.com.
+ */
+async function githubFetch(path: string, token: string, options: RequestInit = {}): Promise<Response> {
+  const url = `${GITHUB_API}${path}`;
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28',
@@ -38,7 +44,7 @@ export async function fetchPRDiff(
     : (process.env.GITHUB_TOKEN || '');
 
   const res = await githubFetch(
-    `${GITHUB_API}/repos/${owner}/${repo}/pulls/${prNumber}`,
+    `/repos/${owner}/${repo}/pulls/${prNumber}`,
     token,
     { headers: { Accept: 'application/vnd.github.v3.diff' } }
   );
@@ -65,7 +71,7 @@ export async function postGitHubComment(
     : (process.env.GITHUB_TOKEN || '');
 
   const res = await githubFetch(
-    `${GITHUB_API}/repos/${owner}/${repo}/issues/${prNumber}/comments`,
+    `/repos/${owner}/${repo}/issues/${prNumber}/comments`,
     token,
     {
       method: 'POST',
@@ -78,3 +84,4 @@ export async function postGitHubComment(
     throw new Error(`Failed to post GitHub comment: ${res.status} ${await res.text()}`);
   }
 }
+
