@@ -1,0 +1,78 @@
+// This is your Prisma schema file
+// https://www.prisma.io/docs/concepts/components/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  githubOrg String   @unique
+  plan      Plan     @default(starter)
+  seats     Int      @default(5)
+  createdAt DateTime @default(now())
+
+  users   User[]
+  reviews Review[]
+
+  @@map("organizations")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  orgId     String?
+  githubId  String   @unique
+  email     String?
+  role      Role     @default(member)
+  createdAt DateTime @default(now())
+
+  org          Organization?  @relation(fields: [orgId], references: [id])
+  docsGenerated DocGenerated[]
+
+  @@map("users")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  orgId      String
+  prUrl      String
+  prTitle    String
+  score      Int
+  issuesJson Json
+  summary    String
+  approved   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  org Organization @relation(fields: [orgId], references: [id])
+
+  @@map("reviews")
+}
+
+model DocGenerated {
+  id         String   @id @default(cuid())
+  userId     String
+  language   String
+  tokensUsed Int
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("docs_generated")
+}
+
+enum Plan {
+  starter
+  pro
+  enterprise
+}
+
+enum Role {
+  admin
+  member
+}

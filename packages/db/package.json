@@ -1,0 +1,20 @@
+{
+  "name": "@devflow/db",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio",
+    "db:seed": "ts-node src/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.8.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.8.1",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  }
+}
