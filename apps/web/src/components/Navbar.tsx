@@ -71,7 +71,7 @@ export default function Navbar() {
               {/* User chip */}
               <div className="hidden sm:flex items-center gap-2">
                 <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white select-none">
-                  {user.githubId.slice(0, 1).toUpperCase()}
+                  {user.githubId && user.githubId.length > 0 ? user.githubId.slice(0, 1).toUpperCase() : '?'}
                 </div>
                 <div className="text-right">
                   <div className="text-xs text-white font-medium leading-none">{user.email ?? `#${user.githubId}`}</div>

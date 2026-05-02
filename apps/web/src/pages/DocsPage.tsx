@@ -44,9 +44,13 @@ export default function DocsPage() {
 
   const handleCopy = async () => {
     if (!result?.docs) return;
-    await navigator.clipboard.writeText(result.docs);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(result.docs);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard not available — silently ignore
+    }
   };
 
   return (

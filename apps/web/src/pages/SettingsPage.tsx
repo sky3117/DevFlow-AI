@@ -31,7 +31,7 @@ export default function SettingsPage() {
           <div className="bg-gradient-to-r from-blue-900/40 to-gray-800 px-6 py-5 border-b border-gray-700">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-2xl font-bold text-white select-none">
-                {user?.githubId?.slice(0, 1).toUpperCase() ?? '?'}
+                {user?.githubId && user.githubId.length > 0 ? user.githubId.slice(0, 1).toUpperCase() : '?'}
               </div>
               <div>
                 <div className="text-white font-semibold text-lg">
